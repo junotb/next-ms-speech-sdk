@@ -1,53 +1,49 @@
-import sdk from 'microsoft-cognitiveservices-speech-sdk';
-import fs from 'fs';
+"use client";
 
-export default function Home() {
-  // Pull in the required packages.
+const Home = () => {
+  const SPEECH_KEY = process.env.SPEECH_KEY!;
+  const SPEECH_REGION = process.env.SPEECH_REGION!;
 
-  // Replace with your own subscription key, service region (e.g., "westus"), and
-  // the name of the file you want to run through the speech recognizer.
-  const subscriptionKey = "YourSubscriptionKey";
-  const serviceRegion = "YourServiceRegion"; // e.g., "westus"
-  const filename = "YourAudioFile.wav"; // 16000 Hz, Mono
+  /*
+    curl --location --request POST "https://%SPEECH_REGION%.tts.speech.microsoft.com/cognitiveservices/v1" ^
+    --header "Ocp-Apim-Subscription-Key: %SPEECH_KEY%" ^
+    --header "Content-Type: application/ssml+xml" ^
+    --header "X-Microsoft-OutputFormat: audio-16khz-128kbitrate-mono-mp3" ^
+    --header "User-Agent: curl" ^
+    --data-raw "<speak version='1.0' xml:lang='en-US'><voice xml:lang='en-US' xml:gender='Female' name='en-US-JennyNeural'>my voice is my passport verify me</voice></speak>" --output output.mp3
+  */
 
-  // Create the push stream we need for the speech sdk.
-  const pushStream = sdk.AudioInputStream.createPushStream();
+  const tts = async () => {
+    const file = await fetch(`https://${SPEECH_REGION}.tts.speech.microsoft.com/cognitiveservices/v1`, {
+      method: "POST",
+      headers: {
+        "Ocp-Apim-Subscription-Key": SPEECH_KEY,
+        "Content-Type": "application/ssml+xml",
+        "X-Microsoft-OutputFormat": "audio-16khz-128kbitrate-mono-mp3",
+        "User-Agent": "curl"
+      },
+      body: `
+        <speak version='1.0' xml:lang='en-US'>
+          <voice xml:lang='en-US' xml:gender='Female' name='en-US-JennyNeural'>
+            my voice is my passport verify me
+          </voice>
+        </speak>
+      `
+    })
+    .then(response => response.blob())
+    .then(blob => new File([blob], 'tts.wav', { lastModified: Date.now() }));
 
-  // Open the file and push it to the push stream.
-  fs.createReadStream(filename).on('data', function(arrayBuffer: any) {
-    pushStream.write(arrayBuffer.buffer);
-  }).on('end', function() {
-    pushStream.close();
-  });
-
-  // We are done with the setup
-  console.log("Now recognizing from: " + filename);
-
-  // Create the audio-config pointing to our stream and
-  // the speech config specifying the language.
-  const audioConfig = sdk.AudioConfig.fromStreamInput(pushStream);
-  const speechConfig = sdk.SpeechConfig.fromSubscription(subscriptionKey, serviceRegion);
-
-  // Setting the recognition language to English.
-  speechConfig.speechRecognitionLanguage = "en-US";
-
-  // Create the speech recognizer.
-  const recognizer = new sdk.SpeechRecognizer(speechConfig, audioConfig);
-
-  // Start the recognizer and wait for a result.
-  recognizer.recognizeOnceAsync(
-    (result) => {
-      console.log(result);
-
-      recognizer.close();
-    },
-    (error) => {
-      console.trace("err - " + error);
-
-      recognizer.close();
-    });
+    var a = document.createElement("a");
+    a.href = window.URL.createObjectURL(file);
+    a.download = "FILENAME2.mp3";
+    a.click();
+  }
+  
   return (
     <main className="min-h-screen">
+      <button onClick={tts}>Click</button>
     </main>
   )
-}
+};
+
+export default Home;
