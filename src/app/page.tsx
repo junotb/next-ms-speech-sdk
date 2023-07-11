@@ -6,9 +6,11 @@ import Script from "next/script";
 import { useRef } from "react";
 
 const Home = () => {
+  const refVoice = useRef<HTMLSelectElement>(null);
   const refPhrase = useRef<HTMLInputElement>(null);
   const refStartSpeakTextAsyncButton = useRef<HTMLButtonElement>(null);
-  const refAudio = useRef<HTMLAnchorElement>(null);
+  const refAudioTag = useRef<HTMLAudioElement>(null);
+  const refAudioFile = useRef<HTMLAnchorElement>(null);
   const refViseme = useRef<HTMLAnchorElement>(null);
 
   const SPEECH_KEY = process.env.SPEECH_KEY!;
@@ -18,7 +20,7 @@ const Home = () => {
     // SSML 작성
     const ssml = `
       <speak version='1.0' xml:lang='en-US'>
-        <voice xml:lang='en-US' xml:gender='Female' name='en-US-JennyNeural'>
+        <voice xml:lang='en-US' name='${refVoice.current!.value}'>
           ${refPhrase.current!.value}
         </voice>
       </speak>
@@ -76,17 +78,18 @@ const Home = () => {
     refStartSpeakTextAsyncButton.current!.disabled = false;
 
     if (audioCompleted) {
-      download(audioData, refAudio, 'audio/mp3', 'audio.mp3');
+      update_audio_src(audioData);
+      download(audioData, refAudioFile, 'audio/mp3', 'audio.mp3');
       download(JSON.stringify(visemes), refViseme, 'application/json', 'viseme.json');
     }
-  }
+  };
 
   const error_SynthesizingAudioCompleted = (error: any) => {
     // Subscription Key 필드 Disabled 종료
     refStartSpeakTextAsyncButton.current!.disabled = false;
     
     window.console.log(error);
-  }
+  };
 
   const tts_rest_deprecated = async () => {
     const ssml = `
@@ -98,8 +101,12 @@ const Home = () => {
     `
 
     const data = await speech_to_text_rest(SPEECH_KEY, SPEECH_REGION, ssml, "test.mp3");
-    download(data, refAudio, "audio/mp3", "audio.mp3");
-  }
+    download(data, refAudioFile, "audio/mp3", "audio.mp3");
+  };
+
+  const update_audio_src = (data: any) => {
+    refAudioTag.current!.src = window.URL.createObjectURL(new Blob([data], { type: "audio/mp3" }));
+  };
   
   const download = (data: any, ref: React.RefObject<HTMLAnchorElement>, filetype: string, filename: string) => {    
     ref.current!.href = window.URL.createObjectURL(new Blob([data], { type: filetype }));
@@ -111,6 +118,15 @@ const Home = () => {
   return (
     <main className="flex flex-col justify-center items-center min-h-screen">
       <div className="flex flex-col justify-center items-center gap-4">
+        <select
+          ref={refVoice}
+          className="w-full px-1 py-2 bg-transparent border-2 border-black dark:border-white"
+        >
+          <option className="p-2 bg-white dark:bg-black" value="en-US-JasonNeural">US: Jason</option>
+          <option className="p-2 bg-white dark:bg-black" value="en-US-CoraNeural">US: Cora</option>
+          <option className="p-2 bg-white dark:bg-black" value="en-GB-RyanNeural">UK: Ryan</option>
+          <option className="p-2 bg-white dark:bg-black" value="en-GB-AbbiNeural">UK: Abbi</option>
+        </select>
         <input
           ref={refPhrase}
           placeholder="phrase"
@@ -121,9 +137,13 @@ const Home = () => {
           className="w-full p-2 bg-transparent border-2 border-black dark:border-white"
           onClick={tts}
         >Click</button>
+        <audio
+          ref={refAudioTag}
+          controls
+        ></audio>
         <div className="flex w-full gap-4">
           <a
-            ref={refAudio}
+            ref={refAudioFile}
             className="w-full p-2 border-2 border-black dark:border-white text-center bg-neutral-500"
           >Audio</a>
           <a
