@@ -6,8 +6,6 @@ import Script from "next/script";
 import { useRef } from "react";
 
 const Home = () => {
-  const refSubscriptionKey = useRef<HTMLInputElement>(null);
-  const refServiceRegion = useRef<HTMLInputElement>(null);
   const refPhrase = useRef<HTMLInputElement>(null);
   const refStartSpeakTextAsyncButton = useRef<HTMLButtonElement>(null);
   const refAudio = useRef<HTMLAnchorElement>(null);
@@ -17,18 +15,6 @@ const Home = () => {
   const SPEECH_REGION = process.env.SPEECH_REGION!;
 
   const tts = () => {
-    // Subscription Key 필드 Disabled 시작
-    refSubscriptionKey.current!.disabled = true;
-
-    // Subscription Key 필드 입력여부 검사
-    if (refSubscriptionKey.current!.value === "") {
-      alert("Please enter your Microsoft Cognitive Services Speech subscription key!");
-
-      // Subscription Key 필드 Disabled 종료
-      refSubscriptionKey.current!.disabled = false;
-      return;
-    }
-
     // SSML 작성
     const ssml = `
       <speak version='1.0' xml:lang='en-US'>
@@ -39,7 +25,7 @@ const Home = () => {
     `;
     
     // Synthesizer 객체 생성
-    const speechConfig = window.SpeechSDK.SpeechConfig.fromSubscription(refSubscriptionKey.current!.value, refServiceRegion.current!.value);
+    const speechConfig = window.SpeechSDK.SpeechConfig.fromSubscription(SPEECH_KEY, SPEECH_REGION);
     const audioConfig = window.SpeechSDK.AudioConfig.fromDefaultSpeakerOutput();
     let synthesizer = new window.SpeechSDK.SpeechSynthesizer(speechConfig, audioConfig);
 
@@ -111,7 +97,7 @@ const Home = () => {
       </speak>
     `
 
-    const data = await speech_to_text_rest(refSubscriptionKey.current!.value, refServiceRegion.current!.value, ssml, "test.mp3");
+    const data = await speech_to_text_rest(SPEECH_KEY, SPEECH_REGION, ssml, "test.mp3");
     download(data, refAudio, "audio/mp3", "audio.mp3");
   }
   
@@ -125,18 +111,6 @@ const Home = () => {
   return (
     <main className="flex flex-col justify-center items-center min-h-screen">
       <div className="flex flex-col justify-center items-center gap-4">
-        <input
-          ref={refSubscriptionKey}
-          placeholder="subscription key"
-          className="w-full p-2 bg-transparent border-2 border-black dark:border-white"
-          defaultValue={SPEECH_KEY}
-        />
-        <input
-          ref={refServiceRegion}
-          placeholder="service region"
-          className="w-full p-2 bg-transparent border-2 border-black dark:border-white"
-          defaultValue={SPEECH_REGION}
-        />
         <input
           ref={refPhrase}
           placeholder="phrase"
