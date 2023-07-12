@@ -1,4 +1,4 @@
 export type Viseme = {
-    offset: number,
-    id: number
+  offset: number,
+  id: number
 }

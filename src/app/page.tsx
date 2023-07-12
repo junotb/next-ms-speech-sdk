@@ -16,8 +16,24 @@ const Home = () => {
   const SPEECH_KEY = process.env.SPEECH_KEY!;
   const SPEECH_REGION = process.env.SPEECH_REGION!;
 
+  let audioDestination: any;
+
   const tts = () => {
-    // SSML 작성
+    // Synthesizer 객체 생성
+    audioDestination = new window.SpeechSDK.SpeakerAudioDestination();    
+    const speechConfig = window.SpeechSDK.SpeechConfig.fromSubscription(SPEECH_KEY, SPEECH_REGION);
+    const audioConfig = window.SpeechSDK.AudioConfig.fromSpeakerOutput(audioDestination);
+    let synthesizer = new window.SpeechSDK.SpeechSynthesizer(speechConfig, audioConfig);
+
+    // 자동재생 방지
+    audioDestination.onAudioStart = () => {
+      audioDestination.pause();
+    };
+
+    // Viseme 배열 초기화
+    let visemes: Viseme[] = [];
+
+    // SSML 마크업을 음원으로 변환
     const ssml = `
       <speak version='1.0' xml:lang='en-US'>
         <voice xml:lang='en-US' name='${refVoice.current!.value}'>
@@ -25,21 +41,11 @@ const Home = () => {
         </voice>
       </speak>
     `;
-    
-    // Synthesizer 객체 생성
-    const speechConfig = window.SpeechSDK.SpeechConfig.fromSubscription(SPEECH_KEY, SPEECH_REGION);
-    const audioConfig = window.SpeechSDK.AudioConfig.fromAudioFileOutput('audio.mp3');
-    let synthesizer = new window.SpeechSDK.SpeechSynthesizer(speechConfig, audioConfig);
-
-    // Viseme 배열 초기화
-    let visemes: Viseme[] = [];
-
-    // SSML 마크업을 음원으로 변환
     synthesizer.speakSsmlAsync(
       ssml,
       (result: any) => {
         // 사용자 콜백함수 실행
-        // 성공여부: Boolean, Audio 데이터: any, Viseme 데이터: Viseme[]
+        // 성공여부: Boolean, Audio 데이터: ArrayBuffer -> any, Viseme 데이터: Viseme[]
         result_SynthesizingAudioCompleted(
           result.reason === window.SpeechSDK.ResultReason.SynthesizingAudioCompleted
           , result.audioData
@@ -149,7 +155,7 @@ const Home = () => {
           <a
             ref={refViseme}
             className="w-full p-2 border-2 border-black dark:border-white text-center bg-neutral-500"
-          >Viseme</a>
+          >JSON</a>
         </div>
       </div>
       <Script src="https://aka.ms/csspeech/jsbrowserpackageraw" />
