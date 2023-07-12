@@ -28,7 +28,7 @@ const Home = () => {
     
     // Synthesizer 객체 생성
     const speechConfig = window.SpeechSDK.SpeechConfig.fromSubscription(SPEECH_KEY, SPEECH_REGION);
-    const audioConfig = window.SpeechSDK.AudioConfig.fromDefaultSpeakerOutput();
+    const audioConfig = window.SpeechSDK.AudioConfig.fromAudioFileOutput('audio.mp3');
     let synthesizer = new window.SpeechSDK.SpeechSynthesizer(speechConfig, audioConfig);
 
     // Viseme 배열 초기화
