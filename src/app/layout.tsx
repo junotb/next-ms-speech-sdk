@@ -1,12 +1,15 @@
 import './globals.css'
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Noto_Sans_KR } from 'next/font/google'
 
-const inter = Inter({ subsets: ['latin'] })
+const notoSansKR = Noto_Sans_KR({
+  subsets: ['latin'],
+  weight: ['100', '300', '400', '500', '700', '900'],
+});
 
 export const metadata: Metadata = {
-  title: 'TTS Juno',
-  description: 'Azure Text To Speech Example with Next.js',
+  title: 'Azure TTS 예제 | Next.js로 구현한 음성합성',
+  description: 'Azure Cognitive Services의 Text-to-Speech API를 활용하여 Next.js 환경에서 구현한 음성합성 데모입니다.',
 }
 
 export default function RootLayout({
@@ -16,10 +19,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body
-        suppressHydrationWarning={true}
-        className={inter.className}
-      >{children}</body>
+      <body className={notoSansKR.className}>{children}</body>
     </html>
   )
 }
