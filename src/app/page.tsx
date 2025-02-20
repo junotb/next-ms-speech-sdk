@@ -105,7 +105,7 @@ const Home = () => {
     refAudioTag.current!.src = window.URL.createObjectURL(new Blob([data], { type: "audio/mp3" }));
   };
   
-  const download = (data: any, ref: React.RefObject<HTMLAnchorElement>, filetype: string, filename: string) => {    
+  const download = (data: any, ref: React.RefObject<HTMLAnchorElement | null>, filetype: string, filename: string) => {    
     ref.current!.href = window.URL.createObjectURL(new Blob([data], { type: filetype }));
     ref.current!.download = filename;
     
