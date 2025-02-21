@@ -1,4 +1,4 @@
-export type Viseme = {
-  offset: number,
-  id: number
+interface Viseme {
+  audioOffset: number;
+  visemeId: number;
 }
