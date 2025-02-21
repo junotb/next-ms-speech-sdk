@@ -1,7 +1,6 @@
 'use client';
 
 import { SpeechConfig, AudioConfig, SpeakerAudioDestination, SpeechSynthesizer, ResultReason, SpeechSynthesisResult } from 'microsoft-cognitiveservices-speech-sdk';
-import { AudioSourceInitializingEvent } from 'microsoft-cognitiveservices-speech-sdk/distrib/lib/src/common/AudioSourceEvents';
 
 const SPEECH_KEY = process.env.NEXT_PUBLIC_SPEECH_KEY!;
 const SPEECH_REGION = process.env.NEXT_PUBLIC_SPEECH_REGION!;
