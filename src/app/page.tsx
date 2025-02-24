@@ -8,9 +8,9 @@ const Home = () => {
   const [audioUrl, setAudioUrl] = useState<string | undefined>(undefined);
   const [visemeUrl, setVisemeUrl] = useState<string | undefined>(undefined);
 
-  const handleSubmit = async (voice: string, expressStyle: string, phrase: string) => {
+  const handleSubmit = async (speechKey: string, speechRegion: string, voice: string, expressStyle: string, phrase: string) => {
     try {
-      const result = await texttospeech(voice, expressStyle, phrase);
+      const result = await texttospeech(speechKey, speechRegion, voice, expressStyle, phrase);
       if (!result) {
         throw new Error('음성 합성 실패');
       }
