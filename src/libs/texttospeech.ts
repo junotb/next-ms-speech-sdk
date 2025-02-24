@@ -2,9 +2,6 @@
 
 import { SpeechConfig, AudioConfig, SpeakerAudioDestination, SpeechSynthesizer, ResultReason, SpeechSynthesisResult } from 'microsoft-cognitiveservices-speech-sdk';
 
-const SPEECH_KEY = process.env.NEXT_PUBLIC_SPEECH_KEY!;
-const SPEECH_REGION = process.env.NEXT_PUBLIC_SPEECH_REGION!;
-
 interface TextToSpeechResult {
   audioUrl: string;
   visemeUrl: string;
@@ -17,11 +14,11 @@ interface TextToSpeechResult {
  * @param phrase 텍스트
  * @returns 음성 데이터와 시각화 데이터
  */
-const texttospeech = async (voice: string, expressStyle: string, phrase: string): Promise<TextToSpeechResult> => {
+const texttospeech = async (speechKey: string, speechRegion: string, voice: string, expressStyle: string, phrase: string): Promise<TextToSpeechResult> => {
   return new Promise((resolve, reject) => {
     // Synthesizer 객체 생성
     const audioDestination = new SpeakerAudioDestination();    
-    const speechConfig = SpeechConfig.fromSubscription(SPEECH_KEY, SPEECH_REGION);
+    const speechConfig = SpeechConfig.fromSubscription(speechKey, speechRegion);
     const audioConfig = AudioConfig.fromSpeakerOutput(audioDestination);
     const synthesizer = new SpeechSynthesizer(speechConfig, audioConfig);
 
